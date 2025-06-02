@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Arrange Question Creator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+      background-color: #f0f0f0;
+    }
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.3rem;
+      font-weight: bold;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      margin-top: 1rem;
+      margin-right: 1rem;
+      padding: 0.6rem 1.2rem;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    pre {
+      background-color: #1e1e1e;
+      color: #0f0;
+      padding: 1rem;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>🧩 Arrange Question Generator</h2>
+
+  <div class="form-group">
+    <label for="questionText">Question Text</label>
+    <input type="text" id="questionText" placeholder="Enter the question" />
+  </div>
+
+  <div class="form-group">
+    <label for="icons">Options (comma separated)</label>
+    <input type="text" id="icons" placeholder="Example: Cuba,Rwanda,India,Pakistan" />
+  </div>
+
+  <div class="form-group">
+    <label for="imageText">Image Text (comma separated - matches options)</label>
+    <input type="text" id="imageText" placeholder="Same as Options usually" />
+  </div>
+
+  <div class="form-group">
+    <label for="correctAnswers">Correct Order (comma separated index positions starting from 1)</label>
+    <input type="text" id="correctAnswers" placeholder="Example: 2,1,3,4" />
+  </div>
+
+  <div class="form-group">
+    <label for="correctAnswerValues">Correct Values (comma separated)</label>
+    <input type="text" id="correctAnswerValues" placeholder="Example: 146th,131st,148th,195th" />
+  </div>
+
+  <div class="form-group">
+    <label for="readMoreLinks">Read More Links (comma separated for each option)</label>
+    <textarea id="readMoreLinks" rows="2" placeholder="Link1,Link2,Link3,Link4"></textarea>
+  </div>
+
+  <button onclick="addArrangeQuestion()">Add Question</button>
+  <button onclick="downloadJSON()">Download JSON</button>
+
+  <h3>📦 Generated JSON</h3>
+  <pre id="output"></pre>
+
+  <script>
+    let arrangeQuestions = [];
+    let idCounter = 1;
+
+    function addArrangeQuestion() {
+      const questionText = document.getElementById("questionText").value.trim();
+      const icons = document.getElementById("icons").value.split(',').map(v => v.trim());
+      const imageText = document.getElementById("imageText").value.split(',').map(v => v.trim());
+      const correctAnswers = document.getElementById("correctAnswers").value.split(',').map(v => parseInt(v.trim()));
+      const correctAnswersValues = document.getElementById("correctAnswerValues").value.split(',').map(v => v.trim());
+      const readMoreLinks = document.getElementById("readMoreLinks").value.split(',').map(v => v.trim());
+
+      if (!questionText || icons.length === 0 || imageText.length === 0 || correctAnswers.length === 0 || correctAnswersValues.length === 0 || readMoreLinks.length === 0) {
+        alert("Please fill in all fields properly.");
+        return;
+      }
+
+      const newQuestion = {
+        id: idCounter++,
+        questionText,
+        icons,
+        imageText,
+        correctAnswers,
+        correctAnswersValues,
+        readMoreLinks,
+      };
+
+      arrangeQuestions.push(newQuestion);
+      document.getElementById("output").textContent = JSON.stringify(arrangeQuestions, null, 2);
+
+      // Clear inputs
+      document.querySelectorAll("input, textarea").forEach(el => el.value = "");
+    }
+
+    function downloadJSON() {
+      const blob = new Blob([JSON.stringify(arrangeQuestions, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "arrange_questions.json";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+  </script>
+
+</body>
+</html>
